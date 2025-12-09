@@ -4,7 +4,7 @@ import {
   TextCardSection,
   BlogPostsList,
 } from '@components/odyssey-theme';
-import Layout from '../../../layouts/Page.astro';
+import Layout from '../../layouts/Page.astro';
 
 const rawPosts = await Astro.glob('./posts/*.mdx');
 
@@ -31,9 +31,9 @@ const seo = {
   <Container>
     <TextCardSection>
       <div class="lang-switcher">
-        <a href="/blog">EN</a>
+        <a href="/blog" class="active">EN</a>
         <a href="/it/blog">IT</a>
-        <a href="/es/blog" class="active">ES</a>
+        <a href="/es/blog">ES</a>
       </div>
 
       <h1>Blog</h1>
