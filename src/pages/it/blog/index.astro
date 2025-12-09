@@ -1,6 +1,8 @@
 ---
 import Layout from '../../../layouts/Page.astro';
-import BASE from '../../../utils/base-url';
+
+// Importa solo i post italiani
+const posts = await Astro.glob('./posts/*.mdx');
 ---
 
 <Layout
@@ -9,9 +11,9 @@ import BASE from '../../../utils/base-url';
 >
   <section class="blog-hero">
     <div class="lang-switcher">
-      <a href={`${BASE}blog/`}>EN</a>
-      <a href={`${BASE}it/blog/`} class="active">IT</a>
-      <a href={`${BASE}es/blog/`}>ES</a>
+      <a href="/blog/">EN</a>
+      <a href="/it/blog/" class="active">IT</a>
+      <a href="/es/blog/">ES</a>
     </div>
 
     <h1>Blog</h1>
@@ -19,7 +21,20 @@ import BASE from '../../../utils/base-url';
   </section>
 
   <section class="posts-grid">
-    <p>Prossimamente...</p>
+    {posts.length === 0 && <p>Nessun articolo disponibile.</p>}
+
+    {posts
+      .sort((a, b) => new Date(b.frontmatter.publishDate) - new Date(a.frontmatter.publishDate))
+      .map((post) => (
+        <article class="post-card">
+          <a href={post.url}>
+            <img src={post.frontmatter.featuredImage} alt={post.frontmatter.title} />
+            <h3>{post.frontmatter.title}</h3>
+            <p class="date">{post.frontmatter.publishDate}</p>
+            <p>{post.frontmatter.excerpt}</p>
+          </a>
+        </article>
+      ))}
   </section>
 </Layout>
 
@@ -51,5 +66,27 @@ import BASE from '../../../utils/base-url';
 
   .posts-grid {
     margin: var(--section-margin) auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .post-card a {
+    text-decoration: none;
+  }
+
+  .post-card img {
+    width: 100%;
+    border-radius: var(--theme-shape-radius);
+    margin-bottom: 0.5rem;
+  }
+
+  .post-card h3 {
+    margin: 0 0 0.25rem 0;
+  }
+
+  .date {
+    font-size: 0.875rem;
+    opacity: 0.7;
   }
 </style>
