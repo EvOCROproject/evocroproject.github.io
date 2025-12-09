@@ -1,47 +1,55 @@
 ---
+import {
+  Container,
+  TextCardSection,
+  BlogPostsList,
+} from '@components/odyssey-theme';
 import Layout from '../../../layouts/Page.astro';
 
-// Importa solo i post italiani
-const posts = await Astro.glob('./posts/*.mdx');
+const rawPosts = await Astro.glob('./posts/*.mdx');
+
+const posts = rawPosts
+  .map(({ frontmatter, url }) => ({
+    title: frontmatter.title,
+    description: frontmatter.description,
+    authors: frontmatter.authors,
+    publishDate: new Date(frontmatter.publishDate),
+    featuredImage: frontmatter.featuredImage,
+    excerpt: frontmatter.excerpt,
+    tags: frontmatter.tags ?? [],
+    href: url,
+  }))
+  .sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime());
+
+const seo = {
+  title: 'Blog | EvOCRO',
+  description: 'Articoli e aggiornamenti dal progetto EvOCRO.',
+};
 ---
 
-<Layout
-  title="Blog"
-  description="Articoli e aggiornamenti dal progetto EvOCRO."
->
-  <section class="blog-hero">
-    <div class="lang-switcher">
-      <a href="/blog/">EN</a>
-      <a href="/it/blog/" class="active">IT</a>
-      <a href="/es/blog/">ES</a>
-    </div>
+<Layout {seo}>
+  <Container>
+    <TextCardSection>
+      <div class="lang-switcher">
+        <a href="/blog">EN</a>
+        <a href="/it/blog" class="active">IT</a>
+        <a href="/es/blog">ES</a>
+      </div>
 
-    <h1>Blog</h1>
-    <p>Articoli e aggiornamenti dal progetto EvOCRO.</p>
-  </section>
+      <h1>Blog</h1>
+      <p>Articoli e aggiornamenti dal progetto EvOCRO.</p>
+    </TextCardSection>
 
-  <section class="posts-grid">
-    {posts.length === 0 && <p>Nessun articolo disponibile.</p>}
-
-    {posts
-      .sort((a, b) => new Date(b.frontmatter.publishDate) - new Date(a.frontmatter.publishDate))
-      .map((post) => (
-        <article class="post-card">
-          <a href={post.url}>
-            <img src={post.frontmatter.featuredImage} alt={post.frontmatter.title} />
-            <h3>{post.frontmatter.title}</h3>
-            <p class="date">{post.frontmatter.publishDate}</p>
-            <p>{post.frontmatter.excerpt}</p>
-          </a>
-        </article>
-      ))}
-  </section>
+    <section class="blog-posts-list__section">
+      <h2>Articoli recenti</h2>
+      <BlogPostsList posts={posts} />
+    </section>
+  </Container>
 </Layout>
 
 <style>
-  .blog-hero {
+  .blog-posts-list__section {
     margin: var(--section-margin) auto;
-    max-width: 56rem;
   }
 
   .lang-switcher {
@@ -62,31 +70,5 @@ const posts = await Astro.glob('./posts/*.mdx');
   .lang-switcher a.active {
     background: var(--theme-primary);
     color: var(--theme-on-primary);
-  }
-
-  .posts-grid {
-    margin: var(--section-margin) auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .post-card a {
-    text-decoration: none;
-  }
-
-  .post-card img {
-    width: 100%;
-    border-radius: var(--theme-shape-radius);
-    margin-bottom: 0.5rem;
-  }
-
-  .post-card h3 {
-    margin: 0 0 0.25rem 0;
-  }
-
-  .date {
-    font-size: 0.875rem;
-    opacity: 0.7;
   }
 </style>
