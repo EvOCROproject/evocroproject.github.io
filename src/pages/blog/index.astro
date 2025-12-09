@@ -1,92 +1,56 @@
 ---
+import { parseISO, isBefore } from 'date-fns';
+import {
+  Container,
+  TextCardSection,
+  BlogPostsList,
+} from '@components/odyssey-theme';
 import Layout from '../../layouts/Page.astro';
 
-// Import all English posts
-const posts = await Astro.glob('./posts/*.mdx');
+const posts = await Astro.glob('./posts/*.mdx').then((posts) =>
+  posts
+    .map(({ frontmatter, url }) => ({
+      title: frontmatter.title,
+      description: frontmatter.description,
+      authors: frontmatter.authors,
+      publishDate: parseISO(frontmatter.publishDate), // <-- adatto a "2025-12-08"
+      featuredImage: frontmatter.featuredImage,
+      excerpt: frontmatter.excerpt,
+      href: url,
+    }))
+    .sort((a, b) => {
+      if (isBefore(a.publishDate, b.publishDate)) return 1;
+      if (isBefore(b.publishDate, a.publishDate)) return -1;
+      return 0;
+    })
+);
+
+const seo = {
+  title: 'Blog | EvOCRO',
+  description: 'Stories, updates and field notes from the EvOCRO project.',
+};
 ---
 
-<Layout
-  title="Blog"
-  description="Updates and field stories from the EvOCRO project."
->
-  <section class="blog-hero">
-    <div class="lang-switcher">
-      <a href="/blog/" class="active">EN</a>
-      <a href="/it/blog/">IT</a>
-      <a href="/es/blog/">ES</a>
-    </div>
+<Layout seo={seo}>
+  <Container>
+    <TextCardSection>
+      <h1>Blog</h1>
+      <p>
+        Stories from the field, project updates and behind-the-scenes notes from the EvOCRO team.
+      </p>
+      {/* Se vuoi tenere la newsletter, lascia questa riga, altrimenti cancellala */}
+      <!-- <NewsletterForm /> -->
+    </TextCardSection>
 
-    <h1>Blog</h1>
-    <p>Updates and field stories from the EvOCRO project.</p>
-  </section>
-
-  <section class="posts-grid">
-    {posts.length === 0 && <p>No posts yet.</p>}
-
-    {posts
-      .sort((a, b) => new Date(b.frontmatter.publishDate) - new Date(a.frontmatter.publishDate))
-      .map((post) => (
-        <article class="post-card">
-          <a href={post.url}>
-            <img src={post.frontmatter.featuredImage} alt={post.frontmatter.title} />
-            <h3>{post.frontmatter.title}</h3>
-            <p class="date">{post.frontmatter.publishDate}</p>
-            <p>{post.frontmatter.excerpt}</p>
-          </a>
-        </article>
-      ))}
-  </section>
+    <section class="blog-posts-list__section">
+      <h2>Recent posts</h2>
+      <BlogPostsList posts={posts} />
+    </section>
+  </Container>
 </Layout>
 
 <style>
-  .blog-hero {
+  .blog-posts-list__section {
     margin: var(--section-margin) auto;
-    max-width: 56rem;
-  }
-
-  .lang-switcher {
-    display: flex;
-    justify-content: flex-end;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .lang-switcher a {
-    padding: 0.25rem 0.75rem;
-    border-radius: 999px;
-    border: 1px solid var(--theme-on-surface-2);
-    font-size: var(--font-size-sm);
-    text-decoration: none;
-  }
-
-  .lang-switcher a.active {
-    background: var(--theme-primary);
-    color: var(--theme-on-primary);
-  }
-
-  .posts-grid {
-    margin: var(--section-margin) auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .post-card a {
-    text-decoration: none;
-  }
-
-  .post-card img {
-    width: 100%;
-    border-radius: var(--theme-shape-radius);
-    margin-bottom: 0.5rem;
-  }
-
-  .post-card h3 {
-    margin: 0 0 0.25rem 0;
-  }
-
-  .date {
-    font-size: 0.875rem;
-    opacity: 0.7;
   }
 </style>
