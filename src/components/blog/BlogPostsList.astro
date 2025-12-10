@@ -13,17 +13,23 @@ const {posts} = Astro.props;
 </ul>
 
 <style>
-.blog-posts-list__list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 2rem;
-}
-@media (max-width: 768px) {
   .blog-posts-list__list {
-    grid-template-columns: 1fr;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+
+    /* Forziamo comportamento “normale” verso sinistra */
+    justify-content: flex-start;
+    justify-items: stretch;
   }
-}
+
+  @media (max-width: 768px) {
+    .blog-posts-list__list {
+      grid-template-columns: 1fr;
+    }
+  }
 </style>
+
