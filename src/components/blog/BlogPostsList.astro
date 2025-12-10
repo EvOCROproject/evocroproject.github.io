@@ -17,13 +17,14 @@ const {posts} = Astro.props;
     margin: 0;
     padding: 0;
     list-style: none;
+
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2rem;
 
-    /* Forziamo comportamento “normale” verso sinistra */
-    justify-content: flex-start;
-    justify-items: stretch;
+    /* ALLINEAMENTO A SINISTRA ANCHE CON 1 SOLO ELEMENTO */
+    justify-content: start;
+    justify-items: start;
   }
 
   @media (max-width: 768px) {
@@ -32,4 +33,3 @@ const {posts} = Astro.props;
     }
   }
 </style>
-
