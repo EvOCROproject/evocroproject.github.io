@@ -51,6 +51,18 @@ const seo = {
 <style>
   .blog-posts-list__section {
     margin: var(--section-margin) auto;
+    text-align: left;        /* forza testo e titoli a sinistra */
+  }
+
+  /* Griglia dei post: assicuriamoci che inizi a sinistra */
+  .blog-posts-list__list {
+    justify-content: flex-start;  /* nel caso qualche CSS globale la spinga a destra */
+    justify-items: stretch;       /* le card occupano tutta la colonna disponibile */
+  }
+
+  /* Ogni anteprima si comporta come un blocco pieno, senza auto-margin strani */
+  .blog-post__preview {
+    margin: 0;
   }
 
   .lang-switcher {
@@ -73,3 +85,4 @@ const seo = {
     color: var(--theme-on-primary);
   }
 </style>
+
