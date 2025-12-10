@@ -49,22 +49,37 @@ const seo = {
 </Layout>
 
 <style>
+  /* Sezione elenco post: sempre in lettura LTR e testo a sinistra */
   .blog-posts-list__section {
     margin: var(--section-margin) auto;
-    text-align: left;        /* forza testo e titoli a sinistra */
+    direction: ltr !important;
+    text-align: left !important;
   }
 
-  /* Griglia dei post: assicuriamoci che inizi a sinistra */
+  /* Lista dei post: griglia che parte da sinistra e non viene “spinta” */
   .blog-posts-list__list {
-    justify-content: flex-start;  /* nel caso qualche CSS globale la spinga a destra */
-    justify-items: stretch;       /* le card occupano tutta la colonna disponibile */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+
+    direction: ltr !important;
+    justify-content: flex-start !important;
+    justify-items: stretch !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
-  /* Ogni anteprima si comporta come un blocco pieno, senza auto-margin strani */
-  .blog-post__preview {
-    margin: 0;
+  /* Singola anteprima: niente auto-margin strani, testo a sinistra */
+  .blog-post__preview,
+  .blog-post__preview a {
+    direction: ltr !important;
+    text-align: left !important;
+    margin: 0 !important;
   }
 
+  /* Switcher delle lingue: resta a destra come prima */
   .lang-switcher {
     display: flex;
     justify-content: flex-end;
@@ -85,4 +100,3 @@ const seo = {
     color: var(--theme-on-primary);
   }
 </style>
-
