@@ -1,29 +1,55 @@
 ---
+import {
+  Container,
+  TextCardSection,
+  BlogPostsList,
+} from '@components/odyssey-theme';
 import Layout from '../../layouts/Page.astro';
-import BASE from '../../utils/base-url';
+
+const rawPosts = await Astro.glob('./posts/*.mdx');
+
+const posts = rawPosts
+  .map(({ frontmatter, url }) => ({
+    title: frontmatter.title,
+    description: frontmatter.description,
+    authors: frontmatter.authors,
+    publishDate: new Date(frontmatter.publishDate),
+    featuredImage: frontmatter.featuredImage,
+    excerpt: frontmatter.excerpt,
+    tags: frontmatter.tags ?? [],
+    href: url,
+  }))
+  .sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime());
+
+const seo = {
+  title: 'News | EvOCRO',
+  description: 'Press releases, media coverage and project updates.',
+};
 ---
 
-<Layout title="News" description="Press releases, media coverage and project updates.">
-  <section class="news-hero">
-    <div class="lang-switcher">
-      <a href={`${BASE}news/`} class="active">EN</a>
-      <a href={`${BASE}it/news/`}>IT</a>
-      <a href={`${BASE}es/news/`}>ES</a>
-    </div>
+<Layout {seo}>
+  <Container>
+    <TextCardSection>
+      <div class="lang-switcher">
+        <a href="/news" class="active">EN</a>
+        <a href="/it/news">IT</a>
+        <a href="/es/news">ES</a>
+      </div>
 
-    <h1>News</h1>
-    <p>Press releases, media coverage and project updates.</p>
-  </section>
+      <h1>News</h1>
+      <p>Press releases, media coverage and project updates.</p>
+    </TextCardSection>
 
-  <section class="posts-grid">
-    <p>Coming soon.</p>
-  </section>
+    <section class="news-posts-list__section">
+      <h2>Latest news</h2>
+      <BlogPostsList posts={posts} />
+    </section>
+  </Container>
 </Layout>
 
 <style>
-  .news-hero {
+  .news-posts-list__section {
     margin: var(--section-margin) auto;
-    max-width: 56rem;
   }
 
   .lang-switcher {
@@ -44,9 +70,5 @@ import BASE from '../../utils/base-url';
   .lang-switcher a.active {
     background: var(--theme-primary);
     color: var(--theme-on-primary);
-  }
-
-  .posts-grid {
-    margin: var(--section-margin) auto;
   }
 </style>
