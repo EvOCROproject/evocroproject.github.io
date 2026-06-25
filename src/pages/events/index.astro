@@ -1,29 +1,55 @@
 ---
+import {
+  Container,
+  TextCardSection,
+  BlogPostsList,
+} from '@components/odyssey-theme';
 import Layout from '../../layouts/Page.astro';
-import BASE from '../../utils/base-url';
+
+const rawPosts = await Astro.glob('./posts/*.mdx');
+
+const posts = rawPosts
+  .map(({ frontmatter, url }) => ({
+    title: frontmatter.title,
+    description: frontmatter.description,
+    authors: frontmatter.authors,
+    publishDate: new Date(frontmatter.publishDate),
+    featuredImage: frontmatter.featuredImage,
+    excerpt: frontmatter.excerpt,
+    tags: frontmatter.tags ?? [],
+    href: url,
+  }))
+  .sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime());
+
+const seo = {
+  title: 'Events | EvOCRO',
+  description: 'Upcoming and past events.',
+};
 ---
 
-<Layout title="Events" description="Upcoming and past events.">
-  <section class="events-hero">
-    <div class="lang-switcher">
-      <a href={`${BASE}events/`} class="active">EN</a>
-      <a href={`${BASE}it/events/`}>IT</a>
-      <a href={`${BASE}es/events/`}>ES</a>
-    </div>
+<Layout {seo}>
+  <Container>
+    <TextCardSection>
+      <div class="lang-switcher">
+        <a href="/events" class="active">EN</a>
+        <a href="/it/events">IT</a>
+        <a href="/es/events">ES</a>
+      </div>
 
-    <h1>Events</h1>
-    <p>Upcoming and past events.</p>
-  </section>
+      <h1>Events</h1>
+      <p>Upcoming and past events.</p>
+    </TextCardSection>
 
-  <section class="events-grid">
-    <p>Coming soon.</p>
-  </section>
+    <section class="events-posts-list__section">
+      <h2>Events</h2>
+      <BlogPostsList posts={posts} />
+    </section>
+  </Container>
 </Layout>
 
 <style>
-  .events-hero {
+  .events-posts-list__section {
     margin: var(--section-margin) auto;
-    max-width: 56rem;
   }
 
   .lang-switcher {
@@ -44,9 +70,5 @@ import BASE from '../../utils/base-url';
   .lang-switcher a.active {
     background: var(--theme-primary);
     color: var(--theme-on-primary);
-  }
-
-  .events-grid {
-    margin: var(--section-margin) auto;
   }
 </style>
