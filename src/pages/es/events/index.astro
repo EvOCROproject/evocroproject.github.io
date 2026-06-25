@@ -1,29 +1,55 @@
 ---
+import {
+  Container,
+  TextCardSection,
+  BlogPostsList,
+} from '@components/odyssey-theme';
 import Layout from '../../../layouts/Page.astro';
-import BASE from '../../../utils/base-url';
+
+const rawPosts = await Astro.glob('./posts/*.mdx');
+
+const posts = rawPosts
+  .map(({ frontmatter, url }) => ({
+    title: frontmatter.title,
+    description: frontmatter.description,
+    authors: frontmatter.authors,
+    publishDate: new Date(frontmatter.publishDate),
+    featuredImage: frontmatter.featuredImage,
+    excerpt: frontmatter.excerpt,
+    tags: frontmatter.tags ?? [],
+    href: url,
+  }))
+  .sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime());
+
+const seo = {
+  title: 'Eventos | EvOCRO',
+  description: 'Eventos próximos y pasados.',
+};
 ---
 
-<Layout title="Eventos" description="Eventos próximos y pasados.">
-  <section class="events-hero">
-    <div class="lang-switcher">
-      <a href={`${BASE}events/`}>EN</a>
-      <a href={`${BASE}it/events/`}>IT</a>
-      <a href={`${BASE}es/events/`} class="active">ES</a>
-    </div>
+<Layout {seo}>
+  <Container>
+    <TextCardSection>
+      <div class="lang-switcher">
+        <a href="/events">EN</a>
+        <a href="/it/events">IT</a>
+        <a href="/es/events" class="active">ES</a>
+      </div>
 
-    <h1>Eventos</h1>
-    <p>Eventos próximos y pasados.</p>
-  </section>
+      <h1>Eventos</h1>
+      <p>Eventos próximos y pasados.</p>
+    </TextCardSection>
 
-  <section class="events-grid">
-    <p>Próximamente.</p>
-  </section>
+    <section class="events-posts-list__section">
+      <h2>Eventos</h2>
+      <BlogPostsList posts={posts} />
+    </section>
+  </Container>
 </Layout>
 
 <style>
-  .events-hero {
+  .events-posts-list__section {
     margin: var(--section-margin) auto;
-    max-width: 56rem;
   }
 
   .lang-switcher {
@@ -44,9 +70,5 @@ import BASE from '../../../utils/base-url';
   .lang-switcher a.active {
     background: var(--theme-primary);
     color: var(--theme-on-primary);
-  }
-
-  .events-grid {
-    margin: var(--section-margin) auto;
   }
 </style>
