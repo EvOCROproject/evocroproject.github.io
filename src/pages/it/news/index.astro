@@ -1,29 +1,55 @@
 ---
+import {
+  Container,
+  TextCardSection,
+  BlogPostsList,
+} from '@components/odyssey-theme';
 import Layout from '../../../layouts/Page.astro';
-import BASE from '../../../utils/base-url';
+
+const rawPosts = await Astro.glob('./posts/*.mdx');
+
+const posts = rawPosts
+  .map(({ frontmatter, url }) => ({
+    title: frontmatter.title,
+    description: frontmatter.description,
+    authors: frontmatter.authors,
+    publishDate: new Date(frontmatter.publishDate),
+    featuredImage: frontmatter.featuredImage,
+    excerpt: frontmatter.excerpt,
+    tags: frontmatter.tags ?? [],
+    href: url,
+  }))
+  .sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime());
+
+const seo = {
+  title: 'Noticias | EvOCRO',
+  description: 'Notas de prensa, cobertura en medios y novedades del proyecto.',
+};
 ---
 
-<Layout title="News" description="Comunicati stampa, rassegna stampa e aggiornamenti sul progetto.">
-  <section class="news-hero">
-    <div class="lang-switcher">
-      <a href={`${BASE}news/`}>EN</a>
-      <a href={`${BASE}it/news/`} class="active">IT</a>
-      <a href={`${BASE}es/news/`}>ES</a>
-    </div>
+<Layout {seo}>
+  <Container>
+    <TextCardSection>
+      <div class="lang-switcher">
+        <a href="/news">EN</a>
+        <a href="/it/news">IT</a>
+        <a href="/es/news" class="active">ES</a>
+      </div>
 
-    <h1>News</h1>
-    <p>Comunicati stampa, rassegna stampa e aggiornamenti sul progetto.</p>
-  </section>
+      <h1>Noticias</h1>
+      <p>Notas de prensa, cobertura en medios y novedades del proyecto.</p>
+    </TextCardSection>
 
-  <section class="posts-grid">
-    <p>Prossimamente.</p>
-  </section>
+    <section class="news-posts-list__section">
+      <h2>Últimas noticias</h2>
+      <BlogPostsList posts={posts} />
+    </section>
+  </Container>
 </Layout>
 
 <style>
-  .news-hero {
+  .news-posts-list__section {
     margin: var(--section-margin) auto;
-    max-width: 56rem;
   }
 
   .lang-switcher {
@@ -44,9 +70,5 @@ import BASE from '../../../utils/base-url';
   .lang-switcher a.active {
     background: var(--theme-primary);
     color: var(--theme-on-primary);
-  }
-
-  .posts-grid {
-    margin: var(--section-margin) auto;
   }
 </style>
