@@ -1,6 +1,15 @@
 ---
 import Layout from '../../../layouts/Page.astro';
 import BASE from '../../../utils/base-url';
+
+const events = await Astro.glob('./posts/*.mdx');
+
+const sortedEvents = events.sort((a, b) => {
+  const dateA = new Date(a.frontmatter.publishDate).getTime();
+  const dateB = new Date(b.frontmatter.publishDate).getTime();
+
+  return dateB - dateA;
+});
 ---
 
 <Layout title="Eventi" description="Eventi in programma e passati.">
@@ -16,7 +25,55 @@ import BASE from '../../../utils/base-url';
   </section>
 
   <section class="events-grid">
-    <p>Prossimamente.</p>
+    {
+      sortedEvents.length > 0 ? (
+        sortedEvents.map((event) => {
+          const slug = event.file
+            .split('/')
+            .pop()
+            ?.replace(/\.mdx?$/, '');
+
+          return (
+            <article class="event-card">
+              {
+                event.frontmatter.featuredImage && (
+                  <img
+                    src={event.frontmatter.featuredImage}
+                    alt={event.frontmatter.title}
+                  />
+                )
+              }
+
+              <div class="event-content">
+                <p class="event-date">
+                  {new Date(
+                    event.frontmatter.publishDate
+                  ).toLocaleDateString('it-IT', {
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                  })}
+                </p>
+
+                <h2>
+                  <a href={`${BASE}it/events/posts/${slug}/`}>
+                    {event.frontmatter.title}
+                  </a>
+                </h2>
+
+                {
+                  event.frontmatter.excerpt && (
+                    <p>{event.frontmatter.excerpt}</p>
+                  )
+                }
+              </div>
+            </article>
+          );
+        })
+      ) : (
+        <p>Prossimamente.</p>
+      )
+    }
   </section>
 </Layout>
 
@@ -47,7 +104,42 @@ import BASE from '../../../utils/base-url';
   }
 
   .events-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+    gap: 1.5rem;
     margin: var(--section-margin) auto;
+    max-width: 72rem;
+  }
+
+  .event-card {
+    overflow: hidden;
+    border: 1px solid var(--theme-on-surface-2);
+    border-radius: 1rem;
+    background: var(--theme-surface-1);
+  }
+
+  .event-card img {
+    display: block;
+    width: 100%;
+    height: 13rem;
+    object-fit: cover;
+  }
+
+  .event-content {
+    padding: 1.25rem;
+  }
+
+  .event-date {
+    margin-bottom: 0.5rem;
+    font-size: var(--font-size-sm);
+    opacity: 0.75;
+  }
+
+  .event-content h2 {
+    margin-top: 0;
+  }
+
+  .event-content h2 a {
+    text-decoration: none;
   }
 </style>
-
