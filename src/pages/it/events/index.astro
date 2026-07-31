@@ -1,86 +1,55 @@
 ---
+import {
+  Container,
+  TextCardSection,
+  BlogPostsList,
+} from '@components/odyssey-theme';
 import Layout from '../../../layouts/Page.astro';
-import BASE from '../../../utils/base-url';
 
-const events = await Astro.glob('./posts/*.mdx');
+const rawPosts = await Astro.glob('./posts/*.mdx');
 
-const sortedEvents = events.sort((a, b) => {
-  const dateA = new Date(a.frontmatter.publishDate).getTime();
-  const dateB = new Date(b.frontmatter.publishDate).getTime();
+const posts = rawPosts
+  .map(({ frontmatter, url }) => ({
+    title: frontmatter.title,
+    description: frontmatter.description,
+    authors: frontmatter.authors,
+    publishDate: new Date(frontmatter.publishDate),
+    featuredImage: frontmatter.featuredImage,
+    excerpt: frontmatter.excerpt,
+    tags: frontmatter.tags ?? [],
+    href: url,
+  }))
+  .sort((a, b) => b.publishDate.getTime() - a.publishDate.getTime());
 
-  return dateB - dateA;
-});
+const seo = {
+  title: 'Eventi | EvOCRO',
+  description: 'Eventi in programma e passati.',
+};
 ---
 
-<Layout title="Eventi" description="Eventi in programma e passati.">
-  <section class="events-hero">
-    <div class="lang-switcher">
-      <a href={`${BASE}events/`}>EN</a>
-      <a href={`${BASE}it/events/`} class="active">IT</a>
-      <a href={`${BASE}es/events/`}>ES</a>
-    </div>
+<Layout {seo}>
+  <Container>
+    <TextCardSection>
+      <div class="lang-switcher">
+        <a href="/events">EN</a>
+        <a href="/it/events" class="active">IT</a>
+        <a href="/es/events">ES</a>
+      </div>
 
-    <h1>Eventi</h1>
-    <p>Eventi in programma e passati.</p>
-  </section>
+      <h1>Eventi</h1>
+      <p>Eventi in programma e passati.</p>
+    </TextCardSection>
 
-  <section class="events-grid">
-    {
-      sortedEvents.length > 0 ? (
-        sortedEvents.map((event) => {
-          const slug = event.file
-            .split('/')
-            .pop()
-            ?.replace(/\.mdx?$/, '');
-
-          return (
-            <article class="event-card">
-              {
-                event.frontmatter.featuredImage && (
-                  <img
-                    src={event.frontmatter.featuredImage}
-                    alt={event.frontmatter.title}
-                  />
-                )
-              }
-
-              <div class="event-content">
-                <p class="event-date">
-                  {new Date(
-                    event.frontmatter.publishDate
-                  ).toLocaleDateString('it-IT', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric',
-                  })}
-                </p>
-
-                <h2>
-                  <a href={`${BASE}it/events/posts/${slug}/`}>
-                    {event.frontmatter.title}
-                  </a>
-                </h2>
-
-                {
-                  event.frontmatter.excerpt && (
-                    <p>{event.frontmatter.excerpt}</p>
-                  )
-                }
-              </div>
-            </article>
-          );
-        })
-      ) : (
-        <p>Prossimamente.</p>
-      )
-    }
-  </section>
+    <section class="events-posts-list__section">
+      <h2>Eventi</h2>
+      <BlogPostsList posts={posts} />
+    </section>
+  </Container>
 </Layout>
 
 <style>
-  .events-hero {
+  .events-posts-list__section {
     margin: var(--section-margin) auto;
-    max-width: 56rem;
   }
 
   .lang-switcher {
@@ -101,45 +70,5 @@ const sortedEvents = events.sort((a, b) => {
   .lang-switcher a.active {
     background: var(--theme-primary);
     color: var(--theme-on-primary);
-  }
-
-  .events-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
-    gap: 1.5rem;
-    margin: var(--section-margin) auto;
-    max-width: 72rem;
-  }
-
-  .event-card {
-    overflow: hidden;
-    border: 1px solid var(--theme-on-surface-2);
-    border-radius: 1rem;
-    background: var(--theme-surface-1);
-  }
-
-  .event-card img {
-    display: block;
-    width: 100%;
-    height: 13rem;
-    object-fit: cover;
-  }
-
-  .event-content {
-    padding: 1.25rem;
-  }
-
-  .event-date {
-    margin-bottom: 0.5rem;
-    font-size: var(--font-size-sm);
-    opacity: 0.75;
-  }
-
-  .event-content h2 {
-    margin-top: 0;
-  }
-
-  .event-content h2 a {
-    text-decoration: none;
   }
 </style>
